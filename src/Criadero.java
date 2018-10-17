@@ -6,7 +6,6 @@ public class Criadero {
 	private int volumen;
 	private String desborde;
 	private int estanquesLlenos;
-	
 
 	public Criadero(LinkedList<EstanqueAbstracta> estanques, int volumen) {
 		this.volumen = volumen;
@@ -15,7 +14,6 @@ public class Criadero {
 
 	public Criadero resolver() {
 
-		
 		int capacidad = 0;
 		float alturaCaño = 0;
 
@@ -31,60 +29,50 @@ public class Criadero {
 		}
 
 		int i = 0;
-		int volumenCaño = 0;
+		float volumenCaño = 0;
 		int cantTanques = 0;
-		int alturaUltimoEst = 0;
+		float alturaultimo = 0;
 
-		while (i < estanques.size() - 1 && volumen >= volumenCaño) {
+		while (i < estanques.size() && volumen > 0) {
+
+			if (i == estanques.size() - 1) {
+				EstanqueBase est2 = (EstanqueBase) estanques.get(i);
+				volumenCaño = (est2.getProfundidadEstanque() - alturaultimo) * est2.getSuperficie();
+				cantTanques++;
+				alturaCaño = ((volumen) * (est2.getProfundidadEstanque() - alturaultimo)) / volumenCaño;
+
+				if (volumen > (est2.getProfundidadEstanque() * est2.getSuperficie())) {
+					alturaultimo = est2.getProfundidadEstanque() - alturaultimo;
+					estanques.get(i).setAlturaAgua(alturaultimo);
+				} else {
+					estanques.get(i).setAlturaAgua(alturaCaño);
+				}
+
+				break;
+			}
 
 			Estanque est = (Estanque) estanques.get(i);
 			volumenCaño = (est.getProfundidadEstanque() - est.getProfundidadCaño()) * est.getSuperficie();
 			alturaCaño = est.getProfundidadEstanque() - est.getProfundidadCaño();
 
-			if (volumen >= volumenCaño) {
+			if (volumen > 0) {
 				cantTanques++;
 				volumen -= volumenCaño;
+				alturaCaño = Math.abs(volumen) / est.getSuperficie();
 				estanques.get(i).setAlturaAgua(alturaCaño);
-
-			} else {
-				int auxvol = 0;
-				auxvol = volumenCaño;
-				cantTanques++;
-				volumen -= volumenCaño;
-				alturaCaño = ((-volumen) * alturaCaño) / volumenCaño;
-				estanques.get(i).setAlturaAgua(alturaCaño);
-
+				alturaultimo = est.getProfundidadCaño();
 			}
 
 			i++;
+
 		}
 
-		Estanque est = (Estanque) estanques.get(i);
-		volumenCaño = (est.getProfundidadEstanque() - est.getProfundidadCaño()) * est.getSuperficie();
-
-		if (volumen >= volumenCaño) {
-
-			cantTanques++;
-			volumen -= volumenCaño;
-			estanques.get(i).setAlturaAgua(alturaCaño);
+		for (i = estanques.size() - 1; i >= cantTanques; i--) {
+			estanques.remove(i);
 		}
 
-			if (volumen > 0) {
-
-				cantTanques++;
-				alturaUltimoEst = est.getProfundidadCaño();
-				i++;
-				alturaCaño = ((-volumen) * alturaCaño) / volumenCaño;
-				estanques.get(i).setAlturaAgua(alturaCaño);
-				
-			}
-			
-			for(i=estanques.size()-1;i>=cantTanques;i--) {
-				estanques.remove(i);
-			}
-		
 		this.setEstanquesLlenos(cantTanques);
-		
+
 		return this;
 
 	}
